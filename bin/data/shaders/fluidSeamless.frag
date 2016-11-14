@@ -165,13 +165,13 @@ float fractalNoise(vec4 samplePoint, int octaves, float lacunarity, float persis
 float noise(vec2 v) {
     float lacunarity = 2.0;
     float persistence = 0.4;
-    int octaves = 4;
+    int octaves = 6;
     float r1 = torusRadii.x;
     float r2 = torusRadii.y;
     vec2 theta = TWO_PI*v;
     float t = time;
     //This is 4d torus: a circle in the x-y plane and a circle in the z-w plane. We shift the origin for time dependence.
-    vec4 noiseCoord = vec4(r1*cos(theta.x)+t,r1*sin(theta.x)+t ,r2*cos(theta.y)+t,r2*sin(theta.y)+t);
+    vec4 noiseCoord = vec4(r1*cos(theta.x),r1*sin(theta.x) + t ,r2*cos(theta.y),r2*sin(theta.y)+t);
     return fractalNoise(noiseCoord,octaves,lacunarity,persistence);
 }
 
@@ -210,10 +210,16 @@ vec2 curlOfNoise() {
 void main()
 {
     vec2 curlN = curlOfNoise();
+    float flowMag = length(curlN);
+    float scaledFlowMag = pow(0.08*flowMag,0.3);
     vec2 advection =  advectionRate * curlN ;
-    float threashold = 0.5;
    
-    vec4 density =  texture(tex0,texCoordVarying + advection*inverseSize);
+    vec4 density =  texture(tex0,texCoordVarying + advection*vec2(inverseSize.x,inverseSize.x));
     
-    outputColor =  vec4(density.rgb, 1.0);
+   //  outputColor =  vec4(curlN,density.b, 1.0);
+   outputColor =  vec4(density.rgb,scaledFlowMag);
+    // outputColor =  vec4(density.rgb,1.0);
+    
+    //outputColor =  vec4(vec3(pow(0.08*flowMag,0.8)),1.0);
+    
 }

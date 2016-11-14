@@ -16,7 +16,7 @@ class FluidSym  {
     public:
         void setup(bool _seamless);//uses window dimensions.
         void setup(bool _seamless,int _width, int _height); //If seamless==true, width and height must be power of 2.
-        void update();
+        void update(float time,float dt);
         void draw();
         void draw(int x,int y);
         ofFbo *fbo = new ofFbo();
@@ -29,7 +29,7 @@ class FluidSym  {
         int height;
     
         bool seamless = true;
-    
+    int counter;
     private:
         ofImage startImage;
         ofShader shader;

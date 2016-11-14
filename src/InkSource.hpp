@@ -13,11 +13,12 @@
 class InkSource:public Particle {
     public:
         void setup(int _width, int _height,double _mass,double _flowPerturbationAmount,double drag) override;
-        void update(ofVec2f force) override;
-        void update() override;
+        void update(ofVec2f force,float time,float dt) override;
+        void update(float time,float dt) override;
        
         double startHue;
         double hueRate;
         double sizeRate;
+    
 };
 

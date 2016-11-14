@@ -7,7 +7,7 @@ int main( ){
     ofGLWindowSettings settings;
     settings.setGLVersion(3,2);
     settings.width = 1024;
-    settings.height = 1024;
+    settings.height = 768;
     
     if(DEBUG_FLUID){
         //set the window to the dimesions of the fluid

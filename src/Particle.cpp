@@ -5,7 +5,7 @@
 //  Created by David Crooks on 24/08/2016.
 //
 //
-
+#include "ofApp.h"
 #include "Particle.hpp"
 
 void Particle::setup(int _width, int _height,double _mass, double _flowPerturbationAmount, double _drag){
@@ -14,28 +14,34 @@ void Particle::setup(int _width, int _height,double _mass, double _flowPerturbat
     width = _width;
     height = _height;
     mass = _mass;
-    image.load("images/particle.png");
     
-    size = 50;
+    
+    size = 40;
     color = ofColor(255,0,0,255);
     
     position = ofVec2f(ofRandom(width), ofRandom(height));
     velocity = 0.1*ofVec2f(-width/2 + ofRandom(width),-height/2 +  ofRandom(height));
+    
+    //velocity = ofVec2f(-300,150);
+    
     
     lastPosition = position;
     
     noiseStartTime = ofRandom(5.0);
 }
 
-void Particle::update(){
-    update(ofVec2f());
+void Particle::update(float time,float dt){
+    update(ofVec2f(), time, dt);
 }
 
-void Particle::update(ofVec2f appliedForce){
-    ofVec2f totalForce = appliedForce + flowPerturbation() + drag();
+void Particle::update(ofVec2f appliedForce,float time,float dt){
+    
+   
+    
+    ofVec2f totalForce = appliedForce + flowPerturbation(time) + drag();
     
     lastPosition = position;
-    double dt = ofGetLastFrameTime();
+   
     ofVec2f acceleration = totalForce/mass;
     
     velocity += acceleration *dt;
@@ -48,10 +54,10 @@ void Particle::update(ofVec2f appliedForce){
 }
 
 
-ofVec2f Particle::flowPerturbation() {
+ofVec2f Particle::flowPerturbation(float t) {
     //This is the same idea as the fluid simulation: Create a flow field from the curl of noise. See comments in the fragment shader.
     
-    double time = noiseStartTime + ofGetElapsedTimef();
+    double time = noiseStartTime + t;
     double x = position.x/width;
     double y =  position.y/height;
     double epsilon = 0.05;
@@ -95,8 +101,8 @@ void Particle::draw(){
 void Particle::drawParticle(ofVec2f drawPoint,double drawSize) {
     int imageX = drawPoint.x - drawSize * 0.5;
     int imageY = drawPoint.y - drawSize * 0.5;
-    
-    image.draw(imageX, imageY, drawSize, drawSize);
+    ofEnableAlphaBlending();
+    image->draw(imageX, imageY, drawSize, drawSize);
 }
 /*
     If we want to maintain a seamless image we need to draw each point multiple times.

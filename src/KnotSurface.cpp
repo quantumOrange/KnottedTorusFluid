@@ -16,9 +16,11 @@
 
 
 void KnotSurface::setup() {
+    quality = 2;
+    
     noiseRate = 0.05; //rate of  evolution of perlin noise, used to randomly deform the KnotSurface.
-    totalKnotPoints = 250;
-    totalLoopPoints = 50;
+    totalKnotPoints = quality*125;
+    totalLoopPoints = quality*25;
     pathScale = 300;
     tubeRadius = 80;
     knotTorusRadiusRatio = 0.5;
@@ -30,6 +32,7 @@ void KnotSurface::setup() {
     normals.assign(2,vector<ofVec3f> (totalKnotPoints+1,ofVec3f()));
     surfacePoints.assign(totalKnotPoints+1,vector<ofVec3f> (totalLoopPoints+1,ofVec3f()));
     surfaceNormals.assign(totalKnotPoints+1,vector<ofVec3f> (totalLoopPoints+1,ofVec3f()));
+    surfaceTangents.assign(totalKnotPoints+1,vector<ofVec3f> (totalLoopPoints+1,ofVec3f()));
     
     
     //precompute the knot points and normals
@@ -41,12 +44,27 @@ void KnotSurface::setup() {
         normals[1][i]     = normal2(knotTorusRadiusRatio,theta);
     }
     
-    material.setShininess(120);
-    material.setSpecularColor(ofColor(255, 255, 255, 255));
+    //material.setShininess(120);
+    //material.setSpecularColor(ofColor(255, 255, 255, 255));
+    
+    shininess = 120;
+    specular = ofFloatColor(1.0,1.0,1.0,1.0);
+    diffuse = ofFloatColor(1.0,1.0,1.0,1.0);
+    emissive = ofFloatColor(0.0,0.0,0.0,0.0);
+    ambient = ofFloatColor(1.0,1.0,1.0,1.0);
+    
+    ambient.setBrightness(0.5);
+    specular.setBrightness(1.0);
+    
+    shader.load("shaders/surface");
+    
+    bumpAmount = 0.2;
 }
 
-void KnotSurface::update() {
-    auto time = ofGetElapsedTimef();
+void KnotSurface::update(float time,float dt) {
+    
+       
+    specular.setBrightness(0.5+0.2*sin(3*time));
     textureOrigin += textureDrift;
     //We are going to create our surface by taking a trefoil knot in space (a closed loop) and thickening it out into a tube.
     
@@ -70,18 +88,54 @@ void KnotSurface::update() {
             auto surfaceVec = n1*sin(phi) + n2*cos(phi);
     
             surfacePoints[i][j] =  knotPoint + radius*surfaceVec;
-            surfaceNormals[i][j] = surfaceVec.normalize();
+            //surfaceNormals[i][j] = surfaceVec.normalize();
         }
     }
+    
+    
+    for(int i=0; i <= totalKnotPoints;i++) {
+        //Theta parameterizes the knot in space.
+        auto theta = ofMap(i,0,totalKnotPoints,0,TWO_PI);
+        
+        auto knotPoint = pathPoints[i];
+        auto n1 = normals[0][i];
+        auto n2 = normals[1][i];
+        
+        for(int j=0; j <= totalLoopPoints;j++) {
+            //Phi parameteriszes the surface in the direction that loops around the  knot
+            double phi = ofMap(j,0,totalLoopPoints,0,TWO_PI);
+            
+            auto   v1 = surfacePoints[ofWrap(i+1,0,totalKnotPoints)][j] - surfacePoints[ofWrap(i-1,0,totalKnotPoints)][j];
+            auto   v2 = surfacePoints[i][ofWrap(j+1,0,totalLoopPoints)] - surfacePoints[i][ofWrap(j-1,0,totalLoopPoints)];
+            
+            auto n = v1.getCrossed(v2);
+            
+            
+            surfaceNormals[i][j] = n.normalize();
+            surfaceTangents[i][j] = v1.normalize();
+        }
+    }
+
+    //bumpAmount = 0.3 + 0.25*cos(3*time);
+    
 }
 
 void KnotSurface::draw() {
-    material.begin();
+    //material.begin();
+    //ofFloatColor v = ofFloatColor(-0.5,-1.0,0.1,0.1);
+    //cout << v << endl;
+    mesh.clear();
+    shader.begin();
+     if(texture) texture->bind();
+    updateLights();
+    updateMaterial();
+    int n = 0;
         for(int i=0; i<totalKnotPoints;i++) {
 
             auto x1 = ofMap(i,0,totalKnotPoints,0,1.0) + textureOrigin.x;
             auto x2 = ofMap(i+1,0,totalKnotPoints,0,1.0) + textureOrigin.x;
-            ofMesh mesh;
+           // ofVboMesh mesh;
+            //
             mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
             
             for(int j=0; j <= totalLoopPoints;j++) {
@@ -93,30 +147,121 @@ void KnotSurface::draw() {
                 ofVec3f n_u = surfaceNormals[i][j];
                 ofVec3f n_v = surfaceNormals[i+1][j];
                 
+                ofVec3f t_u = surfaceTangents[i][j];
+                ofVec3f t_v = surfaceTangents[i+1][j];
+                
                 ofVec2f tex_u = ofVec2f(x1, y);
                 ofVec2f tex_v = ofVec2f(x2, y);
                 
                 mesh.addVertex(u);
                 mesh.addNormal(n_u);
                 mesh.addTexCoord(tex_u);
+                mesh.addColor(ofFloatColor(t_u.x,t_u.y,t_u.z,1.0));
+                
+                //mesh.getVbo().setAttributeData(shader.getAttributeLocation("binormal"), &n_u.x, 3, n, sizeof(float));
+                //n++;
                 
                 mesh.addVertex(v);
                 mesh.addNormal(n_v);
                 mesh.addTexCoord(tex_v);
+                mesh.addColor(ofFloatColor(t_v.x,t_v.y,t_v.z,1.0));
+               // mesh.getVbo().setAttributeData(shader.getAttributeLocation("binormal"), &n_u.x, 3, n, sizeof(float));
             }
             
-            if(texture) texture->bind();
-            mesh.draw();
-            if(texture) texture->unbind();
+           
+            
+            
+             //mesh.draw();
+           
         }
-    material.end();
+    mesh.draw();
+     if(texture) texture->unbind();
+   shader.end();
+   // material.end();
 }
+
+//updateMaterial and updateLights() inelegantly cut and pasted from ofMaterial, with minor modifications. Needs some refactoring.
+
+void KnotSurface::updateMaterial() const{
+    shader.setUniform4fv("mat_ambient", &ambient.r);
+    shader.setUniform4fv("mat_diffuse", &diffuse.r);
+    shader.setUniform4fv("mat_specular", &specular.r);
+    shader.setUniform4fv("mat_emissive", &emissive.r);
+    shader.setUniform4fv("global_ambient", &ofGetGlobalAmbientColor().r);
+    shader.setUniform1f("mat_shininess",shininess);
+    shader.setUniform1f("bumpAmount",bumpAmount);
+    
+}
+
+
+void KnotSurface::updateLights() const{
+    auto renderer = ofGetCurrentRenderer();
+    shader.setUniformMatrix4f("normalMatrix", renderer->getCurrentNormalMatrix());
+    
+    for(size_t i=0;i<ofLightsData().size();i++){
+        string idx = ofToString(i);
+        shared_ptr<ofLight::Data> light = ofLightsData()[i].lock();
+        if(!light || !light->isEnabled){
+            shader.setUniform1f("lights["+idx+"].enabled",0);
+            continue;
+        }
+        
+        
+        ofVec4f lightEyePosition = light->position * renderer->getCurrentViewMatrix();
+        shader.setUniform1f("lights["+idx+"].enabled",1);
+        shader.setUniform1f("lights["+idx+"].type", light->lightType);
+        shader.setUniform4f("lights["+idx+"].position", lightEyePosition);
+        shader.setUniform4f("lights["+idx+"].ambient", light->ambientColor);
+        shader.setUniform4f("lights["+idx+"].specular", light->specularColor);
+        shader.setUniform4f("lights["+idx+"].diffuse", light->diffuseColor);
+        
+        if(light->lightType!=OF_LIGHT_DIRECTIONAL){
+            shader.setUniform1f("lights["+idx+"].constantAttenuation", light->attenuation_constant);
+            shader.setUniform1f("lights["+idx+"].linearAttenuation", light->attenuation_linear);
+            shader.setUniform1f("lights["+idx+"].quadraticAttenuation", light->attenuation_quadratic);
+        }
+        
+        if(light->lightType==OF_LIGHT_SPOT){
+            ofVec3f direction = light->position + light->direction;
+            direction = direction * renderer->getCurrentViewMatrix();
+            direction = direction - lightEyePosition;
+            shader.setUniform3f("lights["+idx+"].spotDirection", direction.normalize());
+            shader.setUniform1f("lights["+idx+"].spotExponent", light->exponent);
+            shader.setUniform1f("lights["+idx+"].spotCutoff", light->spotCutOff);
+            shader.setUniform1f("lights["+idx+"].spotCosCutoff", cos(ofDegToRad(light->spotCutOff)));
+        }else if(light->lightType==OF_LIGHT_DIRECTIONAL){
+            ofVec3f halfVector = (ofVec3f(0,0,1) + lightEyePosition).getNormalized();
+            shader.setUniform3f("lights["+idx+"].halfVector", halfVector);
+        }else if(light->lightType==OF_LIGHT_AREA){
+            shader.setUniform1f("lights["+idx+"].width", light->width);
+            shader.setUniform1f("lights["+idx+"].height", light->height);
+            ofVec3f direction = light->position + light->direction;
+            direction = direction * renderer->getCurrentViewMatrix();
+            direction = direction - lightEyePosition;
+            shader.setUniform3f("lights["+idx+"].spotDirection", direction.normalize());
+            ofVec3f right = light->position + light->right;
+            right = right * renderer->getCurrentViewMatrix();
+            right = right - lightEyePosition;
+            ofVec3f up = right.getCrossed(direction);
+            shader.setUniform3f("lights["+idx+"].right", right.normalize());
+            shader.setUniform3f("lights["+idx+"].up", up.normalize());
+        }
+    }
+    
+    
+}
+
+
+
+
 
 /*
     This radial function allows us to distort the surface and have it evolve over time.
     I'm just adding in some perlin noise and sending a periodic pulse around the knot.
 */
 double KnotSurface::radialDeformation(double theta,double phi,double t) {
+  
+    /*
     auto r1 = 0.5;
     auto r2 = 0.5;
    
@@ -127,16 +272,26 @@ double KnotSurface::radialDeformation(double theta,double phi,double t) {
    
     auto bulge = 0.4*pulse(theta);
     return 1.0 + 0.6*ofNoise(r1*cos(theta+t)+t,r1*sin(theta+t)+t ,r2*cos(phi+t)+t,r2*sin(phi+t)+t) + bulge;
-}
+    
+    */
+    
+    auto r1 =2* 0.5;
+    auto r2 = 0.5 /2 ;
+    
+    //We can make the noise flow around the torus by making the angles time dependent;
+    theta += t;
+    phi += t;
+    t *=  noiseRate;
+    
+    auto bulge = 0.4*pulse(theta);
+    return 1.0 + 0.5*ofNoise(r1*cos(theta)+t,r1*sin(theta)+t ,r2*cos(phi)+t,r2*sin(phi)+t) + bulge;
 
+}
 
 
 double  KnotSurface::pulse(double theta) {
     return 0.5*(1 + cos(theta));
 }
-
-
-
 
 
 ofVec3f KnotSurface::pathPoint(double r, double t) {
@@ -167,7 +322,7 @@ ofVec3f KnotSurface::trefoilKnotPoint(double r, double t){
 
 
 /*
-     Normals.
+    It's Knot Normal!
      
      We want to draw a tube that follows the path of our knot. 
      So for each point of the knot we want to draw a circle ( or any other loop) around the knot.

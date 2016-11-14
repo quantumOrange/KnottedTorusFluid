@@ -13,8 +13,8 @@
 class Particle {
     public:
         virtual void setup(int _width, int _height,double _mass,double _flowPerturbationAmount,double drag);
-        virtual void update(ofVec2f appliedForce);
-        virtual void update();
+        virtual void update(ofVec2f appliedForce,float time,float dt);
+        virtual void update(float time,float dt);
         void draw();
     
         ofVec2f position;
@@ -25,7 +25,7 @@ class Particle {
         double mass;
         double dragCoeffiecent;
         double flowPerturbationAmount;
-        ofImage image;
+        ofImage *image;
         double size;
         ofColor color;
     
@@ -37,12 +37,13 @@ class Particle {
         double varyingSize;
     
         double noiseStartTime;
-    
+    float time,dt;
+    int counter;
     private:
         void drawSeamless(ofVec2f drawPoint,double drawSize);
         void drawParticle(ofVec2f drawPoint,double drawSize);
     
-        ofVec2f flowPerturbation();
+        ofVec2f flowPerturbation(float time);
         ofVec2f drag();
 };
 

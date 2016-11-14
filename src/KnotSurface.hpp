@@ -15,11 +15,15 @@
 class KnotSurface {
     public:
         void setup();
-        void update();
+        void update(float time,float dt);
         void draw();
         ofTexture *texture; //you can pass me a texture if you like.
-    
+        int quality;
+        float bumpAmount;
     private:
+    
+        void updateLights() const;
+        void updateMaterial() const;
         int totalKnotPoints;
         int totalLoopPoints;
         double pathScale;
@@ -35,11 +39,26 @@ class KnotSurface {
     
         ofVec2f textureOrigin;
         ofVec2f textureDrift;
+    
         vector<vector<ofVec3f>> normals;
         vector<vector<ofVec3f>> surfacePoints;
         vector<vector<ofVec3f>> surfaceNormals;
+        vector<vector<ofVec3f>> surfaceTangents;
         vector<ofVec3f> pathPoints;
         ofMaterial material;
+    
+        ofShader shader;
+        ofFloatColor ambient;
+        ofFloatColor diffuse;
+        ofFloatColor specular;
+        ofFloatColor emissive;
+    
+    
+        ofVboMesh mesh;
+    
+        float shininess;
+    
+    int counter;
 };
 
 

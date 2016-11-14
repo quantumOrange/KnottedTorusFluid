@@ -63,6 +63,8 @@
 		ED750FD81D6F2CED000018CB /* fluidSeamless.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = fluidSeamless.frag; path = bin/data/shaders/fluidSeamless.frag; sourceTree = SOURCE_ROOT; };
 		ED750FD91D6F8D78000018CB /* InkSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InkSource.cpp; sourceTree = "<group>"; };
 		ED750FDA1D6F8D78000018CB /* InkSource.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = InkSource.hpp; sourceTree = "<group>"; };
+		EDC971DC1D770A36009456BB /* surface.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = surface.frag; path = bin/data/shaders/surface.frag; sourceTree = SOURCE_ROOT; };
+		EDC971DD1D770A36009456BB /* surface.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = surface.vert; path = bin/data/shaders/surface.vert; sourceTree = SOURCE_ROOT; };
 		EDDA28D01D7307FD004B022F /* fluid.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = fluid.frag; path = bin/data/shaders/fluid.frag; sourceTree = SOURCE_ROOT; };
 		EDDA28D11D7307FD004B022F /* fluid.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = fluid.vert; path = bin/data/shaders/fluid.vert; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -148,6 +150,8 @@
 				ED750FD81D6F2CED000018CB /* fluidSeamless.frag */,
 				EDDA28D01D7307FD004B022F /* fluid.frag */,
 				EDDA28D11D7307FD004B022F /* fluid.vert */,
+				EDC971DC1D770A36009456BB /* surface.frag */,
+				EDC971DD1D770A36009456BB /* surface.vert */,
 			);
 			name = Shaders;
 			sourceTree = "<group>";

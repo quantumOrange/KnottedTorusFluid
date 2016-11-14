@@ -4,10 +4,17 @@
 #include "KnotSurface.hpp"
 #include "FluidSym.hpp"
 #include "InkSource.hpp"
-#define DEBUG_FLUID true
+#define DEBUG_FLUID false
+#define REAL_TIME false //octaves = 5/4!?
 class ofApp : public ofBaseApp{
 
 	public:
+    
+    bool updateFluid = true;
+    bool updateKnot = true;
+    bool updateParticles = true;
+    
+    
 		void setup();
 		void update();
 		void draw();
@@ -24,11 +31,12 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-       
+        //artwork
         FluidSym *fluid;
         KnotSurface *knotSurface;
         vector<InkSource> inkSources;
     
+        //camera
         ofCamera cam; // add mouse controls for camera movement
         double camDistance;
         double camTheta;
@@ -42,6 +50,29 @@ class ofApp : public ofBaseApp{
         int lastMouseX;
         int lastMouseY;
     
+        //lights
         ofLight light;
         ofLight light2;
+        ofLight light3;
+    
+        ofVec3f lightMainPosition;
+        ofVec3f lightDisplacement;
+        void fadeLights(float s);
+        bool recording = false;
+        //record
+       // ofVideoGrabber      vidGrabber;
+        //ofxVideoRecorder    vidRecorder;
+       //bool bRecording;
+       //void startRecord();
+       //void stopRecord();
+    
+    float initialBumpAmount = 0.3;
+    bool doSaveScreen = false;
+
+        float inkStartTime = 7;
+    
+    ofVec3f v;
+    
+    
+    
 };

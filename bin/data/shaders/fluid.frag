@@ -141,7 +141,7 @@ float fractalNoise(vec3 samplePoint, int octaves, float lacunarity, float persis
 float noise(vec2 v) {
     float lacunarity = 2.0;
     float persistence = 0.4;
-    int octaves = 4;
+    int octaves = 5;
     vec3 noiseCoord =  vec3(v,time);
     return fractalNoise(noiseCoord,octaves,lacunarity,persistence);
 }
