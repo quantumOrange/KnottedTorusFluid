@@ -1,38 +1,13 @@
 #include "ofApp.h"
 
-
-
-
-
-
-
 /*
-    A fluid simulation on a torus tied in a knot.
+    A fluid simulation running on a torus tied in a knot.
 */
-void logShaders() {
-    
-    auto renderer = ofGetCurrentRenderer();
-    
-    auto programableRenderer = std::static_pointer_cast<ofGLProgrammableRenderer>(renderer);
-    
-    auto shader = programableRenderer->getCurrentShader();
-    
-    auto vertexShader = shader.getShaderSource(GL_VERTEX_SHADER);
-    auto fragmentShader = shader.getShaderSource(GL_FRAGMENT_SHADER);
-    auto geomtryShader = shader.getShaderSource(GL_GEOMETRY_SHADER_EXT);
-    
-    
-    cout  <<  "-----------------------------------------------------------------------------------" << endl;
-    cout  <<  vertexShader << endl;
-    cout  <<  "-----------------------------------------------------------------------------------" << endl;
-    cout  <<  "-----------------------------------------------------------------------------------" << endl;
-    cout  <<  fragmentShader << endl;
-    cout  <<  "-----------------------------------------------------------------------------------" << endl;
-    cout  <<  "-----------------------------------------------------------------------------------" << endl;
-    cout  <<  geomtryShader << endl;
-    cout  <<  "-----------------------------------------------------------------------------------" << endl;
-}
-//--------------------------------------------------------------
+
+float bumpTimer = 0;
+float shouldBumb = true;
+bool  hasChangedParticles = false;
+bool  hasChangedParticlesAgain = false;
 
 void ofApp::setup(){
     
@@ -63,25 +38,6 @@ void ofApp::setup(){
     image->load("images/particle.png");
     for_each(inkSources.begin(), inkSources.end(),[=](InkSource& p) {p.setup(fluid->width,fluid->height,1.0,40.0,0.005);} );
     for_each(inkSources.begin(), inkSources.end(),[=](InkSource& p) {p.image = image;} );
-    //for_each(inkSources.begin(), inkSources.begin() + 10 ,[=](InkSource& p) {p.color.setSaturation(0);p.color.setBrightness(255);} );
-    // for_each(inkSources.begin(), inkSources.end(),[=](InkSource& p) {p.setup(fluid->width,fluid->height,1.0,4.0,0.001);} );
-    
-    /*
-    //add a large splash of white
-    inkSources[0].color.setSaturation(0);
-    inkSources[0].color.setBrightness(255);
-    inkSources[0].size = 150;
-    inkSources[1].color.setSaturation(0);
-    inkSources[1].color.setBrightness(255);
-    inkSources[1].size = 200;
-    
-    //add a little of a dark complimentary color for contrast.
-    inkSources[2].color.setBrightness(70);
-    inkSources[2].color.setSaturation(255);
-    inkSources[2].startHue = 210; //default start color averages at 30, so 180+30 is the complimentary color.
-     
-     */
-    //for_each(inkSources.begin(), inkSources.end(),[=](InkSource& p) {p.color.setSaturation(<#float saturation#>);} );
     
     //set up the camera
     cam.setScale(1,-1,1);
@@ -124,9 +80,7 @@ void ofApp::setup(){
     light.setAttenuation(0.f, 0.f, at);
     light2.setAttenuation(1.0, 0.f,0);
     light3.setAttenuation(0.f, 0.f,  0.0000001);
-    
-   //  light.setSpecularColor( ofFloatColor(0.0,0.0,1.0,1.0));
-    //light2.setSpecularColor(ofFloatColor(0.0,0.0,1.0,1.0));
+  
     
     lightMainPosition = ofVec3f(400,-160,1150);
     lightDisplacement = ofVec3f(-1500,0,-1600);
@@ -140,11 +94,8 @@ void ofApp::setup(){
     */
     
 }
-float bumpTimer = 0;
-float shouldBumb = true;
-bool hasChangedParticles = false;
-bool hasChangedParticlesAgain = false;
-//--------------------------------------------------------------
+
+
 void ofApp::update(){
     //time line
     float fadeoutDuration = 2.0;//5
@@ -173,7 +124,7 @@ void ofApp::update(){
         std::exit(0);
     }
    
-    //Lights!
+    //Lights!!!
     ofVec3f lightPos  = lightMainPosition;
     
 
@@ -197,16 +148,15 @@ void ofApp::update(){
     light.setPosition(lightPos);
     light2.setPosition(ofVec3f(550,250,-50));
     
-    //Camera!
-    //camTheta += 0.003;
+    //Camera!!!
     ofVec3f camDirection(sin(camTheta)*cos(camPhi),sin(camTheta)*sin(camPhi),cos(camTheta));
     ofVec3f camPosition = camCentre + camDirection * camDistance;
     cam.setPosition(camPosition);
     cam.lookAt(camCentre);
     light3.setPosition(0.7*camPosition + ofVec3f(100,-100,0) );
-    cout<< camPosition <<endl;
-    //Action!
-   
+    
+    
+    //Action!!!
     if(time>startParticlesTime && updateParticles){
         if(time>changeParticlesTime && !hasChangedParticles){
             
@@ -246,16 +196,11 @@ void ofApp::update(){
     
     if(updateKnot)  knotSurface->update(time,dt);
     
-    
-    
-   
-    
     if(!REAL_TIME && recording)
     {
         auto str = "frames/" + ofToString(ofGetFrameNum(),4,'0') + ".png";
         cout << str << endl;
         ofSaveScreen(str);
-       
     }
     
     
@@ -267,24 +212,24 @@ void ofApp::fadeLights(float b){
     ofSetGlobalAmbientColor(amb);
     
     auto c = light.getDiffuseColor();
-    c.setBrightness(b*0.85);//55
+    c.setBrightness(b*0.85);
     light.setDiffuseColor(c);
     auto c2 = light.getSpecularColor();
-    c2.setBrightness(b*0.1);//0.4
+    c2.setBrightness(b*0.1);
     light.setSpecularColor(c2);
     
     auto c3 = light2.getDiffuseColor();
-    c3.setBrightness(b*0.4);//0.4
+    c3.setBrightness(b*0.4);
     light2.setDiffuseColor(c3);
     auto c4 = light2.getSpecularColor();
-    c4.setBrightness(b*0.2);//0.2
+    c4.setBrightness(b*0.2);
     light2.setSpecularColor(c4);
     
     auto c5 = light3.getDiffuseColor();
-    c5.setBrightness(b*0.6);//55
+    c5.setBrightness(b*0.6);
     light3.setDiffuseColor(c5);
     auto c6 = light3.getSpecularColor();
-    c6.setBrightness(b*0.1);//0.4
+    c6.setBrightness(b*0.1);
     light3.setSpecularColor(c6);
 }
 
@@ -306,8 +251,6 @@ void ofApp::draw(){
             ofEnableLighting();
                 light.enable();
                 light2.enable();
-               // light3.enable();
-                //ofDrawSphere(light3.getX(), light3.getY(), light3.getZ(), 50);
                 knotSurface->draw();
             ofDisableLighting();
         cam.end();
@@ -324,36 +267,35 @@ void ofApp::keyPressed(int key){
     
     
     if(key == 's'){
+        // s  to save screen
         doSaveScreen = !doSaveScreen;
     }
 
     if(key == 'r'){
-        //reset cammera
-       // camTheta =camTheta0;
-        //camPhi = camPhi0;
+        // r to record or stop recording
         recording = !recording;
-        
     }
+    
     if(key == 'f'){
-        //framerate
+        //f to log framerate
         cout << ofGetFrameRate() << endl;
     }
+    
     if(key == 'c'){
-        //clear the fluid
-      //  fluid->fbo->begin();
-      //      ofClear(255,255,255, 255);
-      //  fluid->fbo->end();
+        //c to clear the fluid
+        fluid->fbo->begin();
+            ofClear(255,255,255, 255);
+        fluid->fbo->end();
     }
     
-    
+    //a and z for zoom
     if(key == 'a'){
         camDistance += 5;
         cout << camDistance  << endl;
     }
     
-    
     if(key == 'z'){
-        camDistance  -= 10;
+        camDistance  -= 5;
         cout << camDistance  << endl;
     }
     
@@ -382,7 +324,7 @@ void ofApp::stopRecord() {
     vidRecorder.close();
     
 }
- */
+*/
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
 
@@ -405,12 +347,6 @@ void ofApp::mouseDragged(int x, int y, int button){
     
     camTheta += dx*camDeltaAngle;
     camPhi += dy*camDeltaAngle;
-    
-   // cout << "camera angles : ( " << camTheta << "," << camPhi << ")" << endl;
-   // v.x += dx;
-    //v.y += dy;
-    
-      cout << v << endl;
     
 }
 
@@ -450,6 +386,32 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
+/*
+    Logs the vertex, fragment and geomtry shaders
+*/
 
+void logShaders() {
+    
+    auto renderer = ofGetCurrentRenderer();
+    
+    auto programableRenderer = std::static_pointer_cast<ofGLProgrammableRenderer>(renderer);
+    
+    auto shader = programableRenderer->getCurrentShader();
+    
+    auto vertexShader = shader.getShaderSource(GL_VERTEX_SHADER);
+    auto fragmentShader = shader.getShaderSource(GL_FRAGMENT_SHADER);
+    auto geomtryShader = shader.getShaderSource(GL_GEOMETRY_SHADER_EXT);
+    
+    
+    cout  <<  "-----------------------------------------------------------------------------------" << endl;
+    cout  <<  vertexShader << endl;
+    cout  <<  "-----------------------------------------------------------------------------------" << endl;
+    cout  <<  "-----------------------------------------------------------------------------------" << endl;
+    cout  <<  fragmentShader << endl;
+    cout  <<  "-----------------------------------------------------------------------------------" << endl;
+    cout  <<  "-----------------------------------------------------------------------------------" << endl;
+    cout  <<  geomtryShader << endl;
+    cout  <<  "-----------------------------------------------------------------------------------" << endl;
+}
 
 
