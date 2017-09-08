@@ -125,7 +125,7 @@ void ofApp::setup(){
     light2.setAttenuation(1.0, 0.f,0);
     light3.setAttenuation(0.f, 0.f,  0.0000001);
     
-  //  light.setSpecularColor( ofFloatColor(0.0,0.0,1.0,1.0));
+   //  light.setSpecularColor( ofFloatColor(0.0,0.0,1.0,1.0));
     //light2.setSpecularColor(ofFloatColor(0.0,0.0,1.0,1.0));
     
     lightMainPosition = ofVec3f(400,-160,1150);
@@ -198,7 +198,7 @@ void ofApp::update(){
     light2.setPosition(ofVec3f(550,250,-50));
     
     //Camera!
-  //  camTheta += 0.003;
+    //camTheta += 0.003;
     ofVec3f camDirection(sin(camTheta)*cos(camPhi),sin(camTheta)*sin(camPhi),cos(camTheta));
     ofVec3f camPosition = camCentre + camDirection * camDistance;
     cam.setPosition(camPosition);
@@ -225,7 +225,7 @@ void ofApp::update(){
         }
         
         //we're calling draw on the particles, but this is really updateing the fluid. we're not drawing to screen.
-        //This needs to happen befor calling update on the fluid so that theres a bit of diffusion before displaying to screen.
+        //This needs to happen before calling update on the fluid so that theres a bit of diffusion before displaying to screen.
         fluid->fbo->begin();
             for_each(inkSources.begin(), inkSources.end(),[time,dt](InkSource& p) {p.update(time,dt);} );
             for_each(inkSources.begin(), inkSources.end(),[](InkSource& p) {p.draw();} );

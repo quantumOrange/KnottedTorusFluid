@@ -173,7 +173,7 @@ void pointLight( in lightData light, in vec3 normal, in vec3 ecPosition3, inout 
 	
 	// Compute attenuation
 	attenuation = 1.0 / (light.constantAttenuation + light.linearAttenuation * d + light.quadraticAttenuation * d * d);
-   // attenuation = 1000000.0/(d*d) ;
+    // attenuation = 1000000.0/(d*d) ;
 	// Normalize the vector from surface to light position
 	VP = normalize(VP);
 	halfVector = normalize(VP + eye);
@@ -364,7 +364,7 @@ void main (void){
     
    
    // float angle1 = acos( max(0.0, dot(norm,normalize( eyePosition3))));
-  //  float angle2 = acos( max(0.0, dot(norm,normalize( eyePosition3))));
+   // float angle2 = acos( max(0.0, dot(norm,normalize( eyePosition3))));
    // surfaceColor += rotateHueByAngle(angle, textureColor.rgb);
     surfaceColor = textureColor.rgb;
     
@@ -380,5 +380,5 @@ void main (void){
     //vec3 color = rotateHueByAngle(0.0,clampedColor.rgb);
     
     FRAG_COLOR =  clamp( localColor, 0.0, 1.0 );
-   // FRAG_COLOR = vec4(transformedNormal,1.0);//looks cool!
+   //FRAG_COLOR = vec4(transformedNormal,1.0);//looks cool!
   }

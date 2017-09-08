@@ -44,8 +44,6 @@ void KnotSurface::setup() {
         normals[1][i]     = normal2(knotTorusRadiusRatio,theta);
     }
     
-    //material.setShininess(120);
-    //material.setSpecularColor(ofColor(255, 255, 255, 255));
     
     shininess = 120;
     specular = ofFloatColor(1.0,1.0,1.0,1.0);
@@ -66,8 +64,9 @@ void KnotSurface::update(float time,float dt) {
        
     specular.setBrightness(0.5+0.2*sin(3*time));
     textureOrigin += textureDrift;
-    //We are going to create our surface by taking a trefoil knot in space (a closed loop) and thickening it out into a tube.
     
+    //We are going to create our surface by taking a trefoil knot in space (a closed loop) and thickening it out into a tube.
+    //We iterate over i to draw the 1-dimensional knot.
     for(int i=0; i <= totalKnotPoints;i++) {
         //Theta parameterizes the knot in space.
         auto theta = ofMap(i,0,totalKnotPoints,0,TWO_PI);
@@ -88,7 +87,6 @@ void KnotSurface::update(float time,float dt) {
             auto surfaceVec = n1*sin(phi) + n2*cos(phi);
     
             surfacePoints[i][j] =  knotPoint + radius*surfaceVec;
-            //surfaceNormals[i][j] = surfaceVec.normalize();
         }
     }
     
@@ -121,67 +119,60 @@ void KnotSurface::update(float time,float dt) {
 }
 
 void KnotSurface::draw() {
-    //material.begin();
-    //ofFloatColor v = ofFloatColor(-0.5,-1.0,0.1,0.1);
-    //cout << v << endl;
+    
     mesh.clear();
     shader.begin();
-     if(texture) texture->bind();
+    
+    if(texture) texture->bind();
+    
     updateLights();
     updateMaterial();
+    
+    
     int n = 0;
-        for(int i=0; i<totalKnotPoints;i++) {
+    
+    for(int i=0; i<totalKnotPoints;i++) {
 
-            auto x1 = ofMap(i,0,totalKnotPoints,0,1.0) + textureOrigin.x;
-            auto x2 = ofMap(i+1,0,totalKnotPoints,0,1.0) + textureOrigin.x;
-           // ofVboMesh mesh;
-            //
-            mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
-            
-            for(int j=0; j <= totalLoopPoints;j++) {
-                double y = ofMap(j,0,totalLoopPoints,0,1.0)+ textureOrigin.y;
-               
-                ofVec3f u =  surfacePoints[i][j] ;
-                ofVec3f v =  surfacePoints[i+1][j] ;
-                
-                ofVec3f n_u = surfaceNormals[i][j];
-                ofVec3f n_v = surfaceNormals[i+1][j];
-                
-                ofVec3f t_u = surfaceTangents[i][j];
-                ofVec3f t_v = surfaceTangents[i+1][j];
-                
-                ofVec2f tex_u = ofVec2f(x1, y);
-                ofVec2f tex_v = ofVec2f(x2, y);
-                
-                mesh.addVertex(u);
-                mesh.addNormal(n_u);
-                mesh.addTexCoord(tex_u);
-                mesh.addColor(ofFloatColor(t_u.x,t_u.y,t_u.z,1.0));
-                
-                //mesh.getVbo().setAttributeData(shader.getAttributeLocation("binormal"), &n_u.x, 3, n, sizeof(float));
-                //n++;
-                
-                mesh.addVertex(v);
-                mesh.addNormal(n_v);
-                mesh.addTexCoord(tex_v);
-                mesh.addColor(ofFloatColor(t_v.x,t_v.y,t_v.z,1.0));
-               // mesh.getVbo().setAttributeData(shader.getAttributeLocation("binormal"), &n_u.x, 3, n, sizeof(float));
-            }
-            
+        auto x1 = ofMap(i,0,totalKnotPoints,0,1.0) + textureOrigin.x;
+        auto x2 = ofMap(i+1,0,totalKnotPoints,0,1.0) + textureOrigin.x;
+       
+        mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+        
+        for(int j=0; j <= totalLoopPoints;j++) {
+            double y = ofMap(j,0,totalLoopPoints,0,1.0)+ textureOrigin.y;
            
+            ofVec3f u =  surfacePoints[i][j] ;
+            ofVec3f v =  surfacePoints[i+1][j] ;
             
+            ofVec3f n_u = surfaceNormals[i][j];
+            ofVec3f n_v = surfaceNormals[i+1][j];
             
-             //mesh.draw();
-           
+            ofVec3f t_u = surfaceTangents[i][j];
+            ofVec3f t_v = surfaceTangents[i+1][j];
+            
+            ofVec2f tex_u = ofVec2f(x1, y);
+            ofVec2f tex_v = ofVec2f(x2, y);
+            
+            mesh.addVertex(u);
+            mesh.addNormal(n_u);
+            mesh.addTexCoord(tex_u);
+            mesh.addColor(ofFloatColor(t_u.x,t_u.y,t_u.z,1.0));
+            
+            mesh.addVertex(v);
+            mesh.addNormal(n_v);
+            mesh.addTexCoord(tex_v);
+            mesh.addColor(ofFloatColor(t_v.x,t_v.y,t_v.z,1.0));
         }
+
+    }
+    
     mesh.draw();
-     if(texture) texture->unbind();
-   shader.end();
-   // material.end();
+    if(texture) texture->unbind();
+    shader.end();
+   
 }
 
 //updateMaterial and updateLights() inelegantly cut and pasted from ofMaterial, with minor modifications. Needs some refactoring.
-
 void KnotSurface::updateMaterial() const{
     shader.setUniform4fv("mat_ambient", &ambient.r);
     shader.setUniform4fv("mat_diffuse", &diffuse.r);
@@ -190,7 +181,6 @@ void KnotSurface::updateMaterial() const{
     shader.setUniform4fv("global_ambient", &ofGetGlobalAmbientColor().r);
     shader.setUniform1f("mat_shininess",shininess);
     shader.setUniform1f("bumpAmount",bumpAmount);
-    
 }
 
 
@@ -252,30 +242,14 @@ void KnotSurface::updateLights() const{
 }
 
 
-
-
-
 /*
     This radial function allows us to distort the surface and have it evolve over time.
     I'm just adding in some perlin noise and sending a periodic pulse around the knot.
 */
 double KnotSurface::radialDeformation(double theta,double phi,double t) {
   
-    /*
-    auto r1 = 0.5;
-    auto r2 = 0.5;
-   
-    //We can make the noise flow around the torus by making the angles time dependent;
-    theta += t;
-    phi += t;
-    t *=  noiseRate;
-   
-    auto bulge = 0.4*pulse(theta);
-    return 1.0 + 0.6*ofNoise(r1*cos(theta+t)+t,r1*sin(theta+t)+t ,r2*cos(phi+t)+t,r2*sin(phi+t)+t) + bulge;
-    
-    */
-    
-    auto r1 =2* 0.5;
+ 
+    auto r1 = 2*0.5;
     auto r2 = 0.5 /2 ;
     
     //We can make the noise flow around the torus by making the angles time dependent;

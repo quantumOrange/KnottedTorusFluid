@@ -29,11 +29,14 @@ void FluidSym::setup(bool _seamless,int _width, int _height){
     flowEvolutionRate = 0.08;
     flowScale = 0.3;
     
+    
     /*
-    advectionRate = 3.0;
-    flowEvolutionRate = 0.05;
-    flowScale = 0.7;
+        advectionRate = 3.0;
+        flowEvolutionRate = 0.05;
+        flowScale = 0.7;
     */
+    
+    
     if(seamless) {
         //For seamless mode we want to use GL_REPEAT so we need to use power of two textures.
         if(!powerOfTwo(width) ){
