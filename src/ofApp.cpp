@@ -11,8 +11,12 @@ bool  hasChangedParticlesAgain = false;
 
 void ofApp::setup(){
     
+    //We create and run fluid simulation and we have surface in the shape of a knotted torus.
+    //We'll use the fluid as a texture for the knot.
     fluid = new FluidSym();
     knotSurface = new KnotSurface();
+    
+    //We create Inksources, which are just 2d-particles that float around in the fluid, leaving a trail of color.
     auto numberOfInksources = 30;
     inkSources.assign(numberOfInksources,InkSource());
     
@@ -75,7 +79,7 @@ void ofApp::setup(){
     light3.setDiffuseColor( color1 );
     light3.setSpecularColor( color2);
     
-   // lightsetAttenuation(float constant=1.f, float linear=0.f, float quadratic=0.f)
+    
     float at = 0.0000005;
     light.setAttenuation(0.f, 0.f, at);
     light2.setAttenuation(1.0, 0.f,0);
@@ -255,8 +259,6 @@ void ofApp::draw(){
             ofDisableLighting();
         cam.end();
     ofDisableDepthTest();
-    
-    
     
 }
 

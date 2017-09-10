@@ -29,7 +29,8 @@ class FluidSym  {
         int height;
     
         bool seamless = true;
-    int counter;
+        int counter;
+    
     private:
         ofImage startImage;
         ofShader shader;

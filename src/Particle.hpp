@@ -37,8 +37,9 @@ class Particle {
         double varyingSize;
     
         double noiseStartTime;
-    float time,dt;
-    int counter;
+        float time,dt;
+        int counter;
+    
     private:
         void drawSeamless(ofVec2f drawPoint,double drawSize);
         void drawParticle(ofVec2f drawPoint,double drawSize);

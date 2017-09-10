@@ -15,23 +15,16 @@ void InkSource::update(ofVec2f appliedForce,float time,float dt) {
     //we add a random start time so that each ink particle appears to change size independently, rather than all in sync.
     varyingSize =  size*ofNoise(noiseStartTime + sizeRate*time);
     
-    
-    
     //we're going to slowly cycle around the color wheel.
     double hue = ofWrap(startHue ,0,360);
    
-    
     color.setHueAngle(hue);
-    auto opacity =  color.a;
-    
-   if(opacity < 250){
-       
-       color.a += 3;
-       
-   }
-    
-    
    
+    
+    if(color.a < 250){
+        color.a += 3;
+    }
+    
 }
 
 void InkSource::update(float time,float dt) {
@@ -45,8 +38,7 @@ void InkSource::setup(int _width, int _height,double _mass, double _flowPerturba
     hueRate = 0.5;
     size = 10+ofRandom(80);
     startHue = ofWrap(  210 + ofRandom(60),0,360); //start in the red-orange range.
-    //color.setBrightness(ofRandom(255));
-    //color.setSaturation(ofRandom(255));
+    
     color.setBrightness(255.0/2.0);
     color.setSaturation(2*255.0/3.0);
 }

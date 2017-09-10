@@ -58,20 +58,26 @@ class ofApp : public ofBaseApp{
         ofVec3f lightMainPosition;
         ofVec3f lightDisplacement;
         void fadeLights(float s);
-        bool recording = false;
-        //record
-       // ofVideoGrabber      vidGrabber;
-        //ofxVideoRecorder    vidRecorder;
-       //bool bRecording;
-       //void startRecord();
-       //void stopRecord();
     
-    float initialBumpAmount = 0.3;
-    bool doSaveScreen = false;
-
+        float initialBumpAmount = 0.3;
+        bool doSaveScreen = false;
+        
         float inkStartTime = 7;
+        
+        ofVec3f v;
     
-    ofVec3f v;
+        bool recording = false;
+    
+        /*
+        //record
+        ofVideoGrabber      vidGrabber;
+        ofxVideoRecorder    vidRecorder;
+        bool bRecording;
+        void startRecord();
+        void stopRecord();
+         */
+    
+    
     
     
     

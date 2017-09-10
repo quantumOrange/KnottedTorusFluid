@@ -54,19 +54,17 @@ void FluidSym::setup(bool _seamless,int _width, int _height){
         shader.load("shaders/fluid");
     }
     
-    //auto image = ofImage("images/testImage.png");
     auto image = ofImage("images/startimage3.png");
+    
     fbo->allocate(width,height);
     fbo->begin();
-       // ofClear(0,0,0, 255);
         ofClear(255,255,255, 255);
-       // image.draw(0,0,width,height);
+        //image.draw(0,0,width,height);
         fbo->getTexture().setTextureWrap(GL_REPEAT, GL_REPEAT);
     fbo->end();
     
     fbo2->allocate(width,height);
     fbo2->begin();
-        //ofClear(0,0,0, 255);
         ofClear(255,255,255, 255);
         fbo2->getTexture().setTextureWrap(GL_REPEAT, GL_REPEAT);
     fbo2->end();
